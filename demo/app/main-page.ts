@@ -1,10 +1,35 @@
 import * as observable from 'tns-core-modules/data/observable';
 import * as pages from 'tns-core-modules/ui/page';
-import {HelloWorldModel} from './main-view-model';
+import { isAndroid, isIOS } from "tns-core-modules/platform";
+import * as utils from "tns-core-modules/utils/utils";
 
-// Event handler for Page 'loaded' event attached in main-page.xml
+declare const com: any;
+declare const BlinkingLabel: any;
+
+let nativeView;
+let isBlinking = false;
+
 export function pageLoaded(args: observable.EventData) {
-    // Get the event sender
     let page = <pages.Page>args.object;
-    page.bindingContext = new HelloWorldModel();
+}
+
+export function creatingView(args) {
+    if (isIOS) {
+        nativeView = BlinkingLabel.new();
+        nativeView.text = "Native";
+    } else if (isAndroid) {
+        nativeView = new com.hettiger.blinkinglabel.BlinkingLabel(utils.ad.getApplicationContext());
+        nativeView.setText("Native");
+    }
+
+    args.view = nativeView;
+}
+
+export function toggleBlinking() {
+    if (isBlinking) {
+        nativeView.stopBlinking();
+    } else {
+        nativeView.startBlinking();
+    }
+    isBlinking = !isBlinking;
 }
